@@ -48,7 +48,6 @@ public extension Majority {
     }
 
     func getPurchasedProducts() -> AnyPublisher<[Product], APIError> {
-        // TODO: Create a request `/getPurchasedProducts`.
-        return self.requester.availableProducts()
+        return self.requester.purchasedProducts()
     }
 }

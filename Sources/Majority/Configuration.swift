@@ -32,10 +32,7 @@ private extension Configuration {
     /// lower/upper case.
     /// - Returns: The same or fixed API key.
     private static func validate(apiKey: String) -> String {
-        if apiKey.count != 15 {
-            debugPrint("Invalid API key format!")
-        }
-        return apiKey.uppercased()
+        return apiKey
     }
 
     /// Performs project ID validation. Small errors can be fixed automatically, e.g.

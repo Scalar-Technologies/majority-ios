@@ -11,7 +11,7 @@ import Foundation
 public struct ProductPrice: Codable {
 
     /// Integer part of the price in USD, e.g. `1` for $1.99
-    let integerPrice: Int
+    let integer: Int
     /// Fractional part of the price in decimal numbers in USD, e.g. `99` for $1.99
-    let fractionalPrice: Int
+    let fractional: Int
 }
