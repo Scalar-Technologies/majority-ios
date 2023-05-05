@@ -10,7 +10,7 @@ import Foundation
 /// Product type.
 public enum ProductType: Codable {
 
-    /// One-time purchase, can be purchased only once.
+    /// One-time purchase, can be purchased only once. Non-consumable.
     case oneTime(isPurchased: Bool)
 
     // MARK: - Initialization

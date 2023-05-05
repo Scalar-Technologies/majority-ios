@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 public final class Majority {
@@ -5,7 +6,9 @@ public final class Majority {
     /// Should be set in `Majority.initialize`.
     private static var configuration: Configuration? = nil
     /// The only created library instance.
-    private static var _shared = Majority()
+    private static var _shared: Majority!
+
+    private let requester: Requester
 
     /// Singleton getter. Accessible for everyone from everywhere.
     public static var shared: Majority {
@@ -27,8 +30,25 @@ public final class Majority {
             fatalError("You can initialize the library only once!")
         }
         self.configuration = Configuration(apiKey: apiKey, options: options)
+        Self._shared = Majority(apiKey: apiKey)
     }
 
     /// Unaccessible default initializer.
-    private init() { }
+    private init(apiKey: String) {
+        self.requester = Requester(apiKey: apiKey)
+    }
+}
+
+// MARK: - Interface
+
+public extension Majority {
+
+    func getAvailableProducts() -> AnyPublisher<[Product], APIError> {
+        return self.requester.availableProducts()
+    }
+
+    func getPurchasedProducts() -> AnyPublisher<[Product], APIError> {
+        // TODO: Create a request `/getPurchasedProducts`.
+        return self.requester.availableProducts()
+    }
 }

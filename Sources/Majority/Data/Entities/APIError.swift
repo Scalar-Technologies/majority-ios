@@ -10,9 +10,11 @@ import Foundation
 public enum APIError: Decodable, Error {
     
     /// Error coming from web console.
-    case webConsole(statusCode: Int, description: String)
-    /// Error coming from the framework itself.
-    case businessLogic(description: String)
+    case network(statusCode: Int, description: String)
+    /// Error indicating fail during data decoding.
+    case decoding(description: String?)
+    /// Any unhandled API error.
+    case unknown
 
     // MARK: - Initialization
 
@@ -32,7 +34,7 @@ public enum APIError: Decodable, Error {
     }
 
     init(httpStatusCode: Int, description: String) {
-        self = .webConsole(statusCode: httpStatusCode, description: description)
+        self = .network(statusCode: httpStatusCode, description: description)
     }
 
     public init(from decoder: Decoder) throws {
@@ -45,6 +47,6 @@ public enum APIError: Decodable, Error {
         let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
         let statusCode = try keyedContainer.decode(Int.self, forKey: .statusCode)
         let description = try keyedContainer.decode(String.self, forKey: .description)
-        self = .webConsole(statusCode: statusCode, description: description)
+        self = .network(statusCode: statusCode, description: description)
     }
 }
