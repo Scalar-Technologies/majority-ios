@@ -15,6 +15,7 @@ final class Requester {
         case purchasedProducts = "/api/v1/purchased-products"
     }
 
+    private let baseURLString = "http://192.168.50.175:3000"
     private let baseURL = URL(string: "http://192.168.50.175:3000")!
     private let apiKey: String
 
@@ -23,8 +24,8 @@ final class Requester {
     }
 
     func availableProducts() -> AnyPublisher<[Product], APIError> {
-        var availableProductsRequest = URLRequest(url: baseURL.appendingPathExtension(Path.availableProducts.rawValue))
-        availableProductsRequest.addValue(apiKey, forHTTPHeaderField: "UUID") // unique per project
+        var availableProductsRequest = URLRequest(url: baseURL.appendingPathComponent(Path.availableProducts.rawValue))
+        availableProductsRequest.addValue(apiKey, forHTTPHeaderField: "X-API-KEY") // unique per project
         return URLSession.shared
             .dataTaskPublisher(for: availableProductsRequest)
             .tryMap { data, response in
@@ -35,9 +36,13 @@ final class Requester {
                     throw APIError.network(statusCode: response.statusCode, description: response.description)
                 }
 
+                if let string = String(data: data, encoding: .utf8) {
+                    print(string)
+                }
                 return data
             }
-            .decode(type: [Product].self, decoder: JSONDecoder())
+            .decode(type: APIProducts.self, decoder: JSONDecoder())
+            .map { $0.result }
             .mapError { error in
                 if let decodingError = error as? DecodingError {
                     return APIError.decoding(description: decodingError.errorDescription)
@@ -51,10 +56,9 @@ final class Requester {
     }
 
     func purchasedProducts() -> AnyPublisher<[Product], APIError> {
-        var availableProductsRequest = URLRequest(url: baseURL.appendingPathExtension(Path.purchasedProducts.rawValue))
-        availableProductsRequest.addValue(apiKey, forHTTPHeaderField: "UUID") // unique per project
-        // TODO: Retrieve access token from the backend
-        availableProductsRequest.addValue("", forHTTPHeaderField: "Access token") // unique per user
+        var availableProductsRequest = URLRequest(url: baseURL.appendingPathComponent(Path.availableProducts.rawValue))
+        availableProductsRequest.addValue(apiKey, forHTTPHeaderField: "X-API-KEY") // unique per project
+        availableProductsRequest.addValue("", forHTTPHeaderField: "Authorization") // unique per user
         return URLSession.shared
             .dataTaskPublisher(for: availableProductsRequest)
             .tryMap { data, response in
@@ -64,9 +68,14 @@ final class Requester {
                 guard 200..<300 ~= response.statusCode else {
                     throw APIError.network(statusCode: response.statusCode, description: response.description)
                 }
+
+                if let string = String(data: data, encoding: .utf8) {
+                    print(string)
+                }
                 return data
             }
-            .decode(type: [Product].self, decoder: JSONDecoder())
+            .decode(type: APIProducts.self, decoder: JSONDecoder())
+            .map { $0.result }
             .mapError { error in
                 if let decodingError = error as? DecodingError {
                     return APIError.decoding(description: decodingError.errorDescription)
